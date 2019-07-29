@@ -5,6 +5,7 @@ import(
 	"github.com/gorhill/cronexpr"
 	"time"
 )
+//一个简单的demo 任务只执行一次
 func main(){
 	expr,err := cronexpr.Parse("*/2 * * * * * *")
 	if err != nil {

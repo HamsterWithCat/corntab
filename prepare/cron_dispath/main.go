@@ -15,6 +15,11 @@ func init(){
 	//初始化调度表
 	scheduleTable = make(map[string]*CronJob)
 }
+
+//整体思路
+//使用一个全局map存放job名和任务结构体（cron表达式、下一次执行时间）
+//构建全局map
+//启动协程轮训每一个job
 func main(){
 	//一个调度协程，定时检查所有的Cron任务，执行过期任务
 

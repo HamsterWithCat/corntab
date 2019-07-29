@@ -38,13 +38,14 @@ func main(){
 	}(ctxCancel,resultChan)
 
 	//主线程sleep1秒后，取消任务的执行
-	time.Sleep(time.Second*1)
+	time.Sleep(time.Second*3)
 	cancelFunc()
 
 	//主线程轮训result
 	fmt.Println("------轮训开始---------")
 	select {
 	case result := <-resultChan:
-		fmt.Println(string(result.Result),"  ",result.Err.Error())
+		fmt.Printf("%T",result)
+		fmt.Println(string(result.Result),"  ",result.Err)
 	}
 }
