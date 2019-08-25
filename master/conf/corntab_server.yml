@@ -1,0 +1,4 @@
+# corntab server 配置信息
+server_ip: 8070
+
+server_connection_timeout: 5000

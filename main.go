@@ -1,21 +1,17 @@
 package main
 
-import (
-	"context"
-	"fmt"
-	"time"
-)
+import "fmt"
 
-func main(){
+func main() {
 	//时间格式化
 	//fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 	//context 控制
-	ctx,cancelFunc := context.WithCancel(context.Background())
+	/*ctx, cancelFunc := context.WithCancel(context.Background())
 
-	go func(ctx context.Context){
-		for{
+	go func(ctx context.Context) {
+		for {
 			fmt.Println("hahaha")
-			time.Sleep(time.Millisecond*500)
+			time.Sleep(time.Millisecond * 500)
 			select {
 			case <-ctx.Done():
 				fmt.Println("aaaaa")
@@ -26,8 +22,10 @@ func main(){
 		}
 	}(ctx)
 
-	time.Sleep(time.Second*2)
+	time.Sleep(time.Second * 2)
 	cancelFunc()
 	fmt.Println("----------cancel------------")
-	time.Sleep(time.Second*5)
+	time.Sleep(time.Second * 5)*/
+
+	fmt.Println(4<<10)
 }
