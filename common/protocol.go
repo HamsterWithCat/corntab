@@ -16,7 +16,7 @@ func NewResponse() (resp Response) {
 	resp = Response{
 		Code: 0,
 		Msg:  "",
-		Data: struct {}{},
+		Data: struct{}{},
 	}
 	return
 }
