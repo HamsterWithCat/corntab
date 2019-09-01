@@ -19,6 +19,8 @@ func Init() {
 	//定义映射
 	server.POST("/task/save", saveTask)
 	server.GET("/ping", pong)
+	server.POST("/task/delete", deleteTask)
+	server.GET("/task/query", queryTask)
 }
 func Run() error {
 	if server == nil {

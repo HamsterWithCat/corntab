@@ -1,6 +1,7 @@
 package service
 
 import (
+	"corntab/common"
 	"corntab/master/dal"
 	"corntab/master/model"
 	"corntab/master/util"
@@ -12,10 +13,16 @@ import (
 
 //参数为指针类型 返回值为值类型时 函数执行速度最快
 func SaveJob(job *model.SaveJobReq) (oldJob model.SaveJobResp, err error) {
+	//构造返回值
+	oldJob = model.SaveJobResp{}
+	//check name
+	if "" == job.JobName {
+		logrus.Errorf("[service.SaveJob] job name is empty,can not create")
+		return oldJob, errors.NewCTErr(errors.PARAMPARSEERROR)
+	}
+
 	logrus.Infof("save task to etcd server,job name : %s", job.JobName)
 
-	oldJob = model.SaveJobResp{}
-	//构造返回值
 	//判断corn表表达式是否合规
 	_, err = cronexpr.Parse(job.CronExpr)
 	if err != nil {
@@ -38,7 +45,7 @@ func SaveJob(job *model.SaveJobReq) (oldJob model.SaveJobResp, err error) {
 	}
 
 	//解析返回值
-	if "" != old {
+	if nil != old {
 		err = json.Unmarshal([]byte(old), &oldJob.Job)
 		if err != nil {
 			logrus.Warnf("[service.SaveJob] unmarshal task failed,err_msg = %v", err)
@@ -46,4 +53,58 @@ func SaveJob(job *model.SaveJobReq) (oldJob model.SaveJobResp, err error) {
 	}
 	//返回成功
 	return oldJob, nil
+}
+
+func DeleteJob(job *model.DeleteJobReq) (deleteJob model.DeleteJobResp, err error) {
+	deleteJob = model.DeleteJobResp{}
+	//判断job name是否为空
+	if "" == job.JobName {
+		logrus.Errorf("[service.DeleteJob] job name is empty,not allow delete all task")
+		return deleteJob, errors.NewCTErr(errors.TASKNOTEXIST)
+	}
+
+	logrus.Infof("[service.DeleteJob] delete job which key is %s", job.JobName)
+
+	jobName := util.CORNJOBNAMEPREFIX + job.JobName
+	old, err := dal.GetJobMgr().DeleteJob(jobName)
+	if err != nil {
+		logrus.Warnf("[service.DeleteJob]delete job failed,job_name = %s,err_msg = %v", jobName, err)
+		return deleteJob, errors.NewCTErr(errors.DELETETASKERROR)
+	}
+
+	if nil == old {
+		return deleteJob, errors.NewCTErr(errors.TASKNOTEXIST)
+	}
+
+	err = json.Unmarshal(old, &deleteJob.Job)
+	if err != nil {
+		logrus.Warnf("[service.DeleteTask] unmarshal task failed,job_name = %s,err_msg = %v", jobName, err)
+	}
+	return deleteJob, nil
+}
+
+func ListJobs(req *model.QueryJobReq) (queryJobs model.QueryJobResp, err error) {
+	queryJobs = model.QueryJobResp{}
+	logrus.Infof("[service.ListJobs] query job list with prefix:%s", req.JobName)
+	//解析参数
+	jobName := util.CORNJOBNAMEPREFIX + req.JobName
+
+	jobs, err := dal.GetJobMgr().QueryJobWithPrefix(jobName)
+	if err != nil {
+		logrus.Errorf("[service.ListJobs]query job list error,prefix key = %v,err_msg = %v", req.JobName, err)
+		return queryJobs, errors.NewCTErr(errors.QUERYTASKERROR)
+	}
+
+	for _, jobBytes := range jobs {
+		job := common.Job{}
+		err = json.Unmarshal(jobBytes, &job)
+		if err != nil {
+			logrus.Warnf("[service.ListJobs]unmarshal job failed,err_msg = %v", err)
+			continue
+		}
+		queryJobs.Jobs = append(queryJobs.Jobs, job)
+	}
+
+	queryJobs.TotalCount = len(queryJobs.Jobs)
+	return queryJobs, nil
 }
