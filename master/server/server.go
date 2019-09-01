@@ -11,22 +11,26 @@ import (
 var (
 	server *gin.Engine
 )
+
 //初始化server
-func Init(){
+func Init() {
 	//创建路由
 	server = gin.New()
 	//定义映射
-	server.POST("/task/save",saveTask)
+	server.POST("/task/save", saveTask)
+	server.GET("/ping", pong)
 }
-func Run()error{
-	if server == nil{
+func Run() error {
+	if server == nil {
 		logrus.Errorf("[Server.Run] server not initialized")
 		return errors.New("server not initialized")
 	}
-	err := server.Run(":"+strconv.Itoa(int(config.GetServerConfig().IP)))
+	err := server.Run(":" + strconv.Itoa(int(config.GetServerConfig().IP)))
 	if err != nil {
-		logrus.Errorf("[Server.Run]run server failed:%v",err)
+		logrus.Errorf("[Server.Run]run server failed:%v", err)
 		return err
 	}
+
+	logrus.Infof("[Server.Run]server is running")
 	return nil
 }

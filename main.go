@@ -27,5 +27,5 @@ func main() {
 	fmt.Println("----------cancel------------")
 	time.Sleep(time.Second * 5)*/
 
-	fmt.Println(4<<10)
+	fmt.Println(4 << 10)
 }

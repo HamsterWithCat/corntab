@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	//getKeyValue()
-	deleteKey()
+	getKeyValue()
+	//deleteKey()
 }
 func putKeyValue() {
 	//获取KV,用于读写etcd的键值对

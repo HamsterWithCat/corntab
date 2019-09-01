@@ -12,7 +12,7 @@ var (
 	cfg *serverConfig
 )
 
-func GetServerConfig()*serverConfig{
+func GetServerConfig() *serverConfig {
 	if cfg == nil {
 		panic("config not initialized")
 	}
@@ -20,21 +20,25 @@ func GetServerConfig()*serverConfig{
 }
 
 type serverConfig struct {
-	IP     int32     `yaml:"server_ip"`
+	IP int32 `yaml:"server_ip"`
 	//连接超时时间
 	ConnectionTimeout int64 `yaml:"server_connection_timeout"`
+
+	//etcd配置
+	EtcdEndpoints   []string `yaml:"etcd_endpoints"`
+	EtcdDialTimeout int64    `yaml:"etcd_dial_timeout"`
 }
 
 //加载配置文件
-func Init(){
+func Init() {
 	//加载出错 panic
-	if err := parseConf();err != nil{
+	if err := parseConf(); err != nil {
 		panic(err)
 	}
 }
 
 //解析配置文件
-func parseConf()error{
+func parseConf() error {
 	cfg = &serverConfig{}
 
 	//配置文件名称
@@ -42,19 +46,19 @@ func parseConf()error{
 
 	//拼接路径 根据当前配置文件的绝对路径解析出conf文件夹路径，config和conf两文件夹位置不能改变
 	configPath := getCurFilePath()
-	pos := strings.LastIndex(configPath,"/")
+	pos := strings.LastIndex(configPath, "/")
 	rootFilePath := configPath[:pos]
-	confFilePath := rootFilePath+"/conf/"+confFileName
+	confFilePath := rootFilePath + "/conf/" + confFileName
 
 	//读取配置文件信息
-	confStream ,err := ioutil.ReadFile(confFilePath)
+	confStream, err := ioutil.ReadFile(confFilePath)
 	if err != nil {
-		logrus.Errorf("[parseConfig] read conf file failed:%v",err)
+		logrus.Errorf("[parseConfig] read conf file failed:%v", err)
 		return err
 	}
 
 	//解析配置文件
-	err = yaml.Unmarshal(confStream,cfg)
+	err = yaml.Unmarshal(confStream, cfg)
 	if err != nil {
 		logrus.Errorf("[parseConfig] unmarshal config file failed:")
 		return err
@@ -71,6 +75,6 @@ func getCurFilePath() string {
 		return ""
 	}
 	pos := strings.LastIndex(fileLoc, "/")
-	curFolder := fileLoc[0 : pos]
+	curFolder := fileLoc[0:pos]
 	return curFolder
 }
