@@ -108,3 +108,21 @@ func ListJobs(req *model.QueryJobReq) (queryJobs model.QueryJobResp, err error) 
 	queryJobs.TotalCount = len(queryJobs.Jobs)
 	return queryJobs, nil
 }
+
+//杀死任务
+func KillJob(req *model.KillJobReq)(resp model.KillJobResp,err error){
+	resp = model.KillJobResp{}
+	logrus.Infof("[service.KillJob] kill job,job_name = %s",req.JobName)
+
+	if req.JobName == ""{
+		logrus.Warnf("[service.KillJob] can't kill job with empty job name")
+		return resp,errors.NewCTErr(errors.TASKNOTEXIST)
+	}
+	jobName := util.CORNJOBKILLNAMEPREFIX+req.JobName
+	err = dal.GetJobMgr().SaveJobNameWithLease(jobName)
+	if err != nil {
+		logrus.Warnf("[service.KillJob] kill job failed,err_msg = %v",err)
+		return resp,errors.NewCTErr(errors.KILLTASKERROR)
+	}
+	return resp,nil
+}

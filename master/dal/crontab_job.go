@@ -2,8 +2,10 @@ package dal
 
 import (
 	"context"
+	"corntab/master/util"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type JobMgr struct{}
@@ -77,4 +79,26 @@ func (*JobMgr) QueryJobWithPrefix(key string) (values [][]byte, err error) {
 	}
 
 	return values, nil
+}
+
+func (*JobMgr) SaveJobNameWithLease(key string)(err error){
+	//获取操作etcd 客户端
+	mgr := GetManager()
+	kv := clientv3.NewKV(mgr.Client)
+	lease := clientv3.NewLease(mgr.Client)
+
+	var leaseID *clientv3.LeaseGrantResponse
+	leaseID ,err = lease.Grant(context.TODO(),int64(time.Second)*int64(util.DEFAULTLEASETIME))
+	if err != nil {
+		logrus.Errorf("apply lease failed,err_msg = %v",err)
+		return
+	}
+
+	_,err = kv.Put(context.TODO(),key,"",clientv3.WithLease(leaseID.ID))
+	if err != nil {
+		logrus.Errorf("put key with lease id failed:err_msg = %v",err)
+		return
+	}
+
+	return
 }

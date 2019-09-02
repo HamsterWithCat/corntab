@@ -11,6 +11,7 @@ const (
 	SAVETASKERROR
 	DELETETASKERROR
 	QUERYTASKERROR
+	KILLTASKERROR
 
 	CRONEXPRESSIONERROR
 )
@@ -26,6 +27,7 @@ var (
 		SAVETASKERROR:   "存储任务失败,请重试",
 		DELETETASKERROR: "删除任务失败,请重试",
 		QUERYTASKERROR:  "查询任务失败,请重试",
+		KILLTASKERROR:   "杀死任务失败，请重试",
 
 		CRONEXPRESSIONERROR: "cron表达式解析失败",
 	}

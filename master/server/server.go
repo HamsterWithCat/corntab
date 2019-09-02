@@ -21,6 +21,7 @@ func Init() {
 	server.GET("/ping", pong)
 	server.POST("/task/delete", deleteTask)
 	server.GET("/task/query", queryTask)
+	server.POST("/task/kill",killTask)
 }
 func Run() error {
 	if server == nil {

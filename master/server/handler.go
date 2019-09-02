@@ -84,3 +84,25 @@ func queryTask(c *gin.Context) {
 
 	c.JSON(200, resp)
 }
+
+func killTask(c *gin.Context){
+	req := model.KillJobReq{}
+	resp := common.NewResponse()
+
+	logrus.Infof("client request killTask")
+
+	var err error
+	if err = c.ShouldBind(&req);err!=nil{
+		logrus.Errorf("[killTask] param is invalid,err_msg = %v", err)
+		resp.Code, resp.Msg = errors.GetErr(errors.NewCTErr(errors.PARAMPARSEERROR))
+		c.JSON(200, resp)
+		return
+	}
+
+	resp.Data ,err = service.KillJob(&req)
+	if err != nil {
+		resp.Code,resp.Msg = errors.GetErr(err)
+	}
+
+	c.JSON(200,resp)
+}

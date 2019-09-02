@@ -28,3 +28,10 @@ type QueryJobResp struct {
 	Jobs       []common.Job `json:"jobs"`
 	TotalCount int          `json:"total_count"`
 }
+
+//强杀任务
+type KillJobReq struct {
+	JobName string   `json:"job_name"`
+}
+
+type KillJobResp struct {}
